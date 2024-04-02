@@ -26,20 +26,22 @@ builder.Services.AddDbContext<PhoneBookDb>(options =>
             options.UseNpgsql(connectionString));
 
 
+
+builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowOrigin",
+            builder => builder.WithOrigins("http://localhost:4200")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+    });
 var app = builder.Build();
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-/*builder.Services.AddCors(options =>
+app.UseCors(builder =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("http://localhost:5173");
-                      });
+    builder.WithOrigins("http://localhost:4200")
+           .AllowAnyMethod()
+           .AllowAnyHeader();
 });
-
-app.UseCors(MyAllowSpecificOrigins);
-
-app.UseAuthorization();*/
+app.UseAuthorization();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -60,7 +62,7 @@ app.UseEndpoints(endpoints =>
 
 //User Routes
 app.MapControllerRoute(name: "Login",
-                pattern: "user/login",
+                pattern: "user/login/{username}/{password}",
                 defaults: new { controller = "User", action = "Login" });
 
 app.MapControllerRoute(name: "PostUser",
@@ -70,9 +72,7 @@ app.MapControllerRoute(name: "PostUser",
 app.MapControllerRoute(name: "GetUser",
                 pattern: "user/get/{id}",
                 defaults: new { controller = "User", action = "Get" });
-app.MapControllerRoute(name: "UpdateUser",
-                pattern: "user/update/{id}",
-                defaults: new { controller = "User", action = "Update" });
+
 
 //Contact Routes
 app.MapControllerRoute(name: "PostContact",
@@ -83,10 +83,17 @@ app.MapControllerRoute(name: "GetContact",
                 pattern: "contact/get/{username}",
                 defaults: new { controller = "Contact", action = "Get" });
 
+app.MapControllerRoute(name: "UpdateContact",
+                pattern: "contact/update/{id}",
+                defaults: new { controller = "Contact", action = "Update" });
 
 app.MapControllerRoute(name: "DeleteContact",
                 pattern: "contact/delete/{id}",
                 defaults: new { controller = "Contact", action = "Delete" });
+
+app.MapControllerRoute(name: "GetALlContact",
+                pattern: "contact/getall",
+                defaults: new { controller = "Contact", action = "GetAll" });
 
 //ContactType Routes
 app.MapControllerRoute(name: "PostContactType",

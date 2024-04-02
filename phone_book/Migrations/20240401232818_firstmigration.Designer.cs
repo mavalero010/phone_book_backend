@@ -13,7 +13,7 @@ using phone_book.Data;
 namespace phone_book.Migrations
 {
     [DbContext(typeof(PhoneBookDb))]
-    [Migration("20240401081900_firstmigration")]
+    [Migration("20240401232818_firstmigration")]
     partial class firstmigration
     {
         /// <inheritdoc />

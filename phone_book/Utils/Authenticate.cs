@@ -8,7 +8,7 @@ namespace phone_book.Utils
     public class Authenticate
     {
 
-        public readonly PhoneBookDb _dbContext;
+        public  PhoneBookDb _dbContext;
 
         public Authenticate( PhoneBookDb dbContext) { 
          

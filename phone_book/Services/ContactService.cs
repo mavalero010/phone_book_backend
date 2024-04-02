@@ -6,13 +6,14 @@ using phone_book.Data;
 using phone_book.Utils;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace phone_book.Services
 {
     public class ContactService
     {
-        private readonly PhoneBookDb _dbContext;
-        private readonly Authenticate _auth;
+        public PhoneBookDb _dbContext;
+        public Authenticate _auth;
 
         public ContactService(PhoneBookDb dbContext)
         {
@@ -31,7 +32,6 @@ namespace phone_book.Services
             try
             {
                 var user = _dbContext.User.FirstOrDefault(ct => ct.UserName == username);
-                Console.WriteLine("USER: ",user);
                 if (user == null || user.Password != password )
                 {
                     return 401;
@@ -120,8 +120,8 @@ namespace phone_book.Services
                     }
                     return 401;
                 }
-
-                var existingContact = _dbContext.Contact.FirstOrDefault(i => i.Id == id);
+                Console.WriteLine("HOLLAA");
+                var existingContact = _dbContext.Contact.Find(id);
 
                 if (existingContact == null)
                 {
@@ -129,8 +129,13 @@ namespace phone_book.Services
                     return 404;
                 }
 
+               /* var ContactPosition = user.ContactsList.IndexOf(existingContact.UserName);
+                if (ContactPosition != -1) {
+                    user.ContactsList[ContactPosition] = existingContact.UserName;
+                }*/
+
                 existingContact.Name = newContactData.Name;
-                existingContact.UserName = newContactData.UserName;
+                //existingContact.UserName = newContactData.UserName;
                 existingContact.PhoneNumber = newContactData.PhoneNumber;
                 existingContact.ContactTypeId = newContactData.ContactTypeId;
                 if (newContactData.AdditionalFields!=null)
@@ -145,6 +150,24 @@ namespace phone_book.Services
                 return 500;
             }
         }
-        
+
+        internal List<Contact> GetContacts(User u)
+        {
+            try {
+                if (u.ContactsList != null){
+                    List<Contact> items = new List<Contact>(2);
+                    foreach (string element in u.ContactsList)
+                    {
+                        var contact =  _dbContext.Contact.FirstOrDefault(i => i.UserName == element);
+                     
+                        items.Add(contact);
+                    }
+                    return items;
+                }
+                return [];
+            } catch {
+                return [];
+            }
+        }
     }
 }

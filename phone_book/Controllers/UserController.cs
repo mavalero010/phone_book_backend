@@ -6,7 +6,7 @@ namespace phone_book.Controllers
 {
     public class UserController  : ControllerBase
     {
-        private readonly UserService _userService;
+        private  UserService _userService;
 
         public UserController(UserService userService)
         {
@@ -35,12 +35,32 @@ namespace phone_book.Controllers
         }
 
 
-        [HttpPost]
-        public IActionResult Login(string username, string password)
-        {
 
-            var response = _userService.Login(username, password);
-            return StatusCode(response);
+        [HttpPost]
+        public object Login(string username, string password)
+        {
+            try
+            {
+
+                if (username == null && password == null)
+                {
+                return null;
+                }
+
+                var ct = _userService.Login(username, password);
+                if (ct == null)
+                {
+                    return null;
+                }
+
+
+                return ct;
+            }
+            catch (Exception e)
+
+            {
+                return StatusCode(500);
+            }
         }
         [HttpPost]
         public IActionResult Post([FromBody] User user)

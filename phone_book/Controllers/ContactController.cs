@@ -4,12 +4,11 @@ using phone_book.Services;
 
 namespace phone_book.Controllers
 {
-    
-   
+
+
     public class ContactController : ControllerBase
     {
-        private readonly ContactService _contactService;
-
+        public ContactService _contactService;
         public ContactController(ContactService contactService)
         {
             _contactService = contactService;
@@ -25,7 +24,7 @@ namespace phone_book.Controllers
                 {
                     return NotFound();
                 }
-                
+
                 return Ok(contact);
             } catch {
                 return StatusCode(500);
@@ -46,11 +45,11 @@ namespace phone_book.Controllers
                 {
                     return BadRequest();
                 }
-                var ct = _contactService.PostContact(contact, additionalFields,username,password);
+                var ct = _contactService.PostContact(contact, additionalFields, username, password);
                 if (ct == 409) {
                     return StatusCode(ct);
                 }
-           
+
                 if (ct == 500)
                 {
                     return StatusCode(500);
@@ -58,12 +57,35 @@ namespace phone_book.Controllers
 
                 return Ok(contact);
             }
-            catch(Exception e)
+            catch (Exception e)
 
             {
                 Console.WriteLine(e);
                 return StatusCode(500);
             }
+        }
+
+
+
+        [HttpGet]
+        public IActionResult GetAll([FromBody] User C)
+        {
+            try
+            {
+                var contacts = _contactService.GetContacts(C);
+
+                if (contacts == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(contacts);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+
         }
 
 
@@ -76,7 +98,7 @@ namespace phone_book.Controllers
                 string username = info.username;
                 string password = info.password;
                 int id = c.Id;
-                var ct = _contactService.DeleteContact(username,password,id);
+                var ct = _contactService.DeleteContact(username, password, id);
                 if (ct == 409)
                 {
                     //No Existing Contact
@@ -93,21 +115,21 @@ namespace phone_book.Controllers
                     return StatusCode(ct);
                 }
                 return Ok();
-            } catch { 
+            } catch {
 
                 return StatusCode(500);
             }
         }
 
-        [HttpPut]
-        public IActionResult Update(ContactFields info)
+        [HttpPut] 
+    public IActionResult Update([FromBody] ContactFields info, [FromRoute] int id)
         {
             try {
                 Contact c = info.C;
                 string username = info.username;
                 string password = info.password;
-                int id = c.Id;
                 var ct = _contactService.UpdateContact(username, password, id,c);
+                Console.WriteLine("ID: ", id);
                 if (ct == 409)
                 {
                     //No Existing Contact

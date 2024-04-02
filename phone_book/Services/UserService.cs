@@ -6,28 +6,28 @@ namespace phone_book.Services
 {
     public class UserService
     {
-        private readonly PhoneBookDb _dbContext;
-        private readonly Authenticate _auth;
+        public  PhoneBookDb _dbContext;
+        public  Authenticate _auth;
+        public UserService _UserService;
+
         public UserService(PhoneBookDb dbContext) {
             _dbContext = dbContext;
         }
 
-        public int Login(string username, string password)
+        public object Login(string username, string password)
         {
             try
             {
-                var user = _auth.Authenticating(username, password);
-
-                if(user == null)
+                var user = _dbContext.User.FirstOrDefault(ct => ct.UserName == username);
+                if (user == null || user.Password != password)
                 {
-                    return 401;
-                }
-
-                return 200;
+                    return null;
+                };
+                return user;
             }
             catch
             {
-                return 500;
+                return null;
             }
         }
 
